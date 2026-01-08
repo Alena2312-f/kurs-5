@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     "drf_yasg",
     "users",
     "habits",
-    "telegram_bot",
 ]
 
 MIDDLEWARE = [

@@ -3,7 +3,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 from habits.models import Habit
-from telegram_bot.tasks import send_telegram_notification
+from habits.tasks import send_telegram_notification
 
 
 @receiver(post_save, sender=Habit)
@@ -25,4 +25,4 @@ def habit_post_save(sender, instance, created, **kwargs):
         return
 
     # Планируем отправку уведомления
-    send_telegram_notification.apply_async(args=[instance.user_id, message])
+    send_telegram_notification.apply_async(args=[instance.user__id, message])

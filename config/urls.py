@@ -27,7 +27,6 @@ urlpatterns = [
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/users/", include("users.urls", namespace="users")),
     path("api/habits/", include("habits.urls", namespace="habits")),
-    path("api/telegram/", include("telegram_bot.urls", namespace="telegram_bot")),
     path(
         "swagger<format>/", schema_view.without_ui(cache_timeout=0), name="schema-json"
     ),

@@ -1,7 +1,7 @@
+from django.contrib.auth import get_user_model
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
@@ -10,6 +10,7 @@ class UserTests(APITestCase):
         """
         Тест для проверки регистрации пользователя.
         """
+        User = get_user_model()
         url = reverse('users:register')
         data = {
             'username': 'testuser',
@@ -32,6 +33,7 @@ class UserTests(APITestCase):
         """
         Тест для проверки получения JWT токена.
         """
+        User = get_user_model()
         User.objects.create_user(
             username='testuser',
             password='testpassword',
