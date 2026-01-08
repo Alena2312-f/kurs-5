@@ -10,10 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
-
 import os
 from datetime import timedelta
 from pathlib import Path
+
 from celery.schedules import crontab
 from dotenv import load_dotenv
 
@@ -166,11 +166,8 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_CREDENTIALS = True  # Разрешить передачу куки и заголовков авторизации
 
 # Celery settings
-CELERY_BROKER_URL = os.environ.get(
-    "REDIS_URL", "redis://localhost:6379/0"
-)  # Redis URL из переменной окружения
-CELERY_RESULT_BACKEND = os.environ.get(
-    "REDIS_URL", "redis://localhost:6379/0")
+CELERY_BROKER_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")  # Redis URL из переменной окружения
+CELERY_RESULT_BACKEND = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"

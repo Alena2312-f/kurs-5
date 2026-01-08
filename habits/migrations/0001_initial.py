@@ -2,8 +2,9 @@
 
 import django.core.validators
 import django.db.models.deletion
-import habits.validators
 from django.db import migrations, models
+
+import habits.validators
 
 
 class Migration(migrations.Migration):

@@ -14,9 +14,7 @@ def send_telegram_notification(user_id, message):
     Отправляет сообщение в Telegram.
     """
 
-    from users.models import (
-        User,
-    )  # Импортируем модель User здесь, чтобы избежать циклических зависимостей
+    from users.models import User  # Импортируем модель User здесь, чтобы избежать циклических зависимостей
 
     user = User.objects.get(pk=user_id)
     chat_id = user.tg_chat_id

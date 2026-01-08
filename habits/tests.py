@@ -1,9 +1,11 @@
+from datetime import time
+
+from django.contrib.auth import get_user_model
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-from django.contrib.auth import get_user_model
+
 from .models import Habit
-from datetime import time
 
 
 class HabitTests(APITestCase):
@@ -13,12 +15,12 @@ class HabitTests(APITestCase):
         """
         User = get_user_model()
         self.user = User.objects.create_user(
-            username='testuser',
-            password='testpassword',
-            email='test@example.com',
-            first_name='Test',
-            last_name='User',
-            tg_chat_id='123456789'
+            username="testuser",
+            password="testpassword",
+            email="test@example.com",
+            first_name="Test",
+            last_name="User",
+            tg_chat_id="123456789",
         )
         self.client.force_authenticate(user=self.user)
 
@@ -26,18 +28,18 @@ class HabitTests(APITestCase):
         """
         Тест для проверки создания привычки.
         """
-        url = reverse('habits:habit_create')
+        url = reverse("habits:habit_create")
         data = {
-            'place': 'Home',
-            'time': '10:00:00',
-            'action': 'Read a book',
-            'is_pleasant': False,
-            'periodicity': 1,
-            'reward': 'Watch a movie',
-            'execution_time': 60,
-            'is_public': True
+            "place": "Home",
+            "time": "10:00:00",
+            "action": "Read a book",
+            "is_pleasant": False,
+            "periodicity": 1,
+            "reward": "Watch a movie",
+            "execution_time": 60,
+            "is_public": True,
         }
-        response = self.client.post(url, data, format='json')
+        response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Habit.objects.count(), 1)
         self.assertEqual(Habit.objects.get().user, self.user)
@@ -48,19 +50,19 @@ class HabitTests(APITestCase):
         """
         habit = Habit.objects.create(
             user=self.user,
-            place='Home',
+            place="Home",
             time=time(10, 0, 0),
-            action='Read a book',
+            action="Read a book",
             is_pleasant=False,
             periodicity=1,
-            reward='Watch a movie',
+            reward="Watch a movie",
             execution_time=60,
-            is_public=True
+            is_public=True,
         )
-        url = reverse('habits:habit_retrieve', kwargs={'pk': habit.pk})
-        response = self.client.get(url, format='json')
+        url = reverse("habits:habit_retrieve", kwargs={"pk": habit.pk})
+        response = self.client.get(url, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['place'], 'Home')
+        self.assertEqual(response.data["place"], "Home")
 
     def test_update_habit(self):
         """
@@ -68,29 +70,29 @@ class HabitTests(APITestCase):
         """
         habit = Habit.objects.create(
             user=self.user,
-            place='Home',
+            place="Home",
             time=time(10, 0, 0),
-            action='Read a book',
+            action="Read a book",
             is_pleasant=False,
             periodicity=1,
-            reward='Watch a movie',
+            reward="Watch a movie",
             execution_time=60,
-            is_public=True
+            is_public=True,
         )
-        url = reverse('habits:habit_update', kwargs={'pk': habit.pk})
+        url = reverse("habits:habit_update", kwargs={"pk": habit.pk})
         data = {
-            'place': 'Work',
-            'time': '11:00:00',
-            'action': 'Write code',
-            'is_pleasant': False,
-            'periodicity': 1,
-            'reward': 'Listen to music',
-            'execution_time': 120,
-            'is_public': False
+            "place": "Work",
+            "time": "11:00:00",
+            "action": "Write code",
+            "is_pleasant": False,
+            "periodicity": 1,
+            "reward": "Listen to music",
+            "execution_time": 120,
+            "is_public": False,
         }
-        response = self.client.put(url, data, format='json')
+        response = self.client.put(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(Habit.objects.get().place, 'Work')
+        self.assertEqual(Habit.objects.get().place, "Work")
 
     def test_delete_habit(self):
         """
@@ -98,17 +100,17 @@ class HabitTests(APITestCase):
         """
         habit = Habit.objects.create(
             user=self.user,
-            place='Home',
+            place="Home",
             time=time(10, 0, 0),
-            action='Read a book',
+            action="Read a book",
             is_pleasant=False,
             periodicity=1,
-            reward='Watch a movie',
+            reward="Watch a movie",
             execution_time=60,
-            is_public=True
+            is_public=True,
         )
-        url = reverse('habits:habit_delete', kwargs={'pk': habit.pk})
-        response = self.client.delete(url, format='json')
+        url = reverse("habits:habit_delete", kwargs={"pk": habit.pk})
+        response = self.client.delete(url, format="json")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Habit.objects.count(), 0)
 
@@ -117,6 +119,7 @@ from unittest.mock import patch
 
 import pytest
 from django.contrib.auth.models import User
+
 from habits.tasks import send_telegram_notification
 
 
@@ -127,12 +130,12 @@ def test_send_telegram_message():
     """
     # Создаем тестового пользователя с tg_chat_id
     user = User.objects.create_user(
-        username='testuser',
-        password='testpassword',
-        email='test@example.com',
-        first_name='Test',
-        last_name='User',
-        tg_chat_id='123456789'
+        username="testuser",
+        password="testpassword",
+        email="test@example.com",
+        first_name="Test",
+        last_name="User",
+        tg_chat_id="123456789",
     )
 
     with patch("telegram_bot.tasks.requests.post") as mock_post:
@@ -150,5 +153,5 @@ def test_send_telegram_message():
         # Получаем аргументы, с которыми был вызван mock_post
         args, kwargs = mock_post.call_args
         # Проверяем, что chat_id и text были переданы в requests.post
-        assert kwargs['data']['chat_id'] == '123456789'
-        assert kwargs['data']['text'] == message
+        assert kwargs["data"]["chat_id"] == "123456789"
+        assert kwargs["data"]["text"] == message
