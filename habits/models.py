@@ -2,8 +2,13 @@ from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from .validators import (validate_execution_time, validate_periodicity, validate_pleasant_habit,
-                         validate_related_habit_and_reward, validate_reward_or_related_habit_for_pleasant)
+from .validators import (
+    validate_execution_time,
+    validate_periodicity,
+    validate_pleasant_habit,
+    validate_related_habit_and_reward,
+    validate_reward_or_related_habit_for_pleasant,
+)
 
 
 class Habit(models.Model):
