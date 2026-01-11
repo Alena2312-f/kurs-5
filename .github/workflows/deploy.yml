@@ -1,9 +1,6 @@
 name: CI/CD Pipeline
 
-on:
-  push:
-    branches:
-      - develop  # Запускаем при push в ветку develop
+on: [push]
 
 jobs:
   build:
