@@ -1,0 +1,67 @@
+name: CI/CD Pipeline
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python >=3.12
+        uses: actions/setup-python@v3
+        with:
+          python-version: ">=3.12"
+
+      - name: Install Poetry
+        run: curl -sSL https://install.python-poetry.org | python -
+
+      - name: Configure Poetry
+        run: |
+          poetry config virtualenvs.in-project true
+          echo "POETRY_HOME=$(poetry config --list | grep '^ *cache_dir' | awk '{print $3}')" >> $GITHUB_ENV
+          echo "$(poetry config --list | grep '^ *cache_dir' | awk '{print $3}')/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        run: poetry install
+
+      - name: Run linting
+        run: |
+          flake8 . --exclude=migrations
+
+      - name: Run tests
+        run: |
+          pytest habits/tests.py users/tests.py telegram_bot/tests.py
+
+      - name: Build Docker images
+        run: docker-compose build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'  # Деплоим только из ветки develop
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Install SSH key
+        run: |
+          mkdir -p ~/.ssh/
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        run: |
+          ssh your_user@your_server_ip "
+            cd /path/to/your/project
+            git pull origin develop
+            docker-compose up -d --build
+            docker system prune -f --volumes
+          "

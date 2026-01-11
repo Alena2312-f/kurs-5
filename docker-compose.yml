@@ -1,0 +1,67 @@
+
+services:
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_USER: your_user
+      POSTGRES_PASSWORD: your_password
+      POSTGRES_DB: habit_tracker_db
+
+  redis:
+    image: redis:latest
+
+  django:
+    build: .
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/mediafiles
+    expose:
+      - 8000
+    depends_on:
+      - db
+      - redis
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings
+      POSTGRES_USER: ${DATABASE_USER}  # Используем переменные окружения из .env
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+      REDIS_URL: redis://redis:6379/0
+    env_file:
+      - .env
+
+  celery:
+    build: .
+    command: celery -A config.celery_app worker -l info
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+      - db
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+      REDIS_URL: redis://redis:6379/0
+    env_file:
+      - .env
+
+  nginx:
+    build: ./nginx
+    ports:
+      - "80:80"
+      - "443:443" # Add 443 port for HTTPS
+    depends_on:
+      - django
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/mediafiles
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
