@@ -158,3 +158,62 @@ ReDoc: http://localhost:8000/redoc/
 
 ## Лицензия
 [Здесь можете указать информацию о лицензии проекта]
+
+## Локальный запуск
+
+1.  **Установите Docker и Docker Compose.**
+2.  **Склонируйте репозиторий:** `git clone <your_repository_url>`
+3.  **Перейдите в директорию проекта:** `cd habit_tracker`
+4.  **Создайте файл `.env` и заполните переменными окружения:**
+    *   `SECRET_KEY=<your_secret_key>`
+    *   `DEBUG=True`
+    *   `DATABASE_URL=postgres://<user>:<password>@db:5432/habit_tracker_db`  (используйте имя сервиса `db` из docker-compose.yml)
+    *   `REDIS_URL=redis://redis:6379/0`  (используйте имя сервиса `redis` из docker-compose.yml)
+    *   `TELEGRAM_BOT_TOKEN=<ваш_токен_бота>`
+    *   `TELEGRAM_CHAT_ID=<ваш_chat_id>`
+    *   `ALLOWED_HOSTS=*`
+    *   `POSTGRES_USER=<your_user>`
+    *   `POSTGRES_PASSWORD=<your_password>`
+    *   `POSTGRES_DB=<habit_tracker_db>`
+5.  **Запустите сервисы:** `docker-compose up -d --build`
+6.  **Примените миграции:** `docker-compose exec django python manage.py migrate`
+7.  **Создайте суперпользователя:** `docker-compose exec django python manage.py createsuperuser`
+8.  **Соберите статические файлы:** `docker-compose exec django python manage.py collectstatic`
+9.  **Откройте браузер и перейдите по адресу:** `http://localhost` (если вы не настроили SSL) или `https://localhost` (если настроили SSL).
+
+## Настройка CI/CD и деплоя на сервер
+
+1.  **Настройте удаленный сервер:**
+    *   Установите Docker и Docker Compose.
+    *   Настройте SSH-доступ с использованием приватного ключа.
+    *   Установите python и poetry. (если нужно)
+2.  **Добавьте секреты GitHub Actions:**
+    *   `SSH_PRIVATE_KEY`: Приватный ключ SSH.
+    *   `SSH_KNOWN_HOSTS`: Содержимое файла `~/.ssh/known_hosts`.
+3.  **Убедитесь, что workflow-файл (`.github/workflows/deploy.yml`) правильно настроен.**
+4.  **Сделайте push в ветку `develop`, чтобы запустить CI/CD пайплайн.**
+
+## Адрес сервера
+
+[http://your_server_ip](http://your_server_ip) (Если настроили http) или [https://your_server_ip](https://your_server_ip) (Если настроили HTTPS)
+
+## Инструкция по настройке сервера и CI/CD
+
+1.  **Подготовка сервера:**
+    *   Установите Docker и Docker Compose. (см. пункт 3 на шаге 3).
+    *   Настройте SSH-доступ к серверу. (см. пункт 2 на шаге 3).
+    *   Создайте пользователя и добавьте его в группу docker.
+    *   Настройте Python и poetry (не обязательно, так как используем Docker).
+
+2.  **Настройка GitHub Actions:**
+    *   В репозитории GitHub перейдите в "Settings" -> "Secrets and variables" -> "Actions".
+    *   Нажмите "New repository secret" и добавьте:
+        *   `SSH_PRIVATE_KEY`: Скопируйте содержимое вашего приватного ключа SSH.
+        *   `SSH_KNOWN_HOSTS`: Выполните команду `ssh-keyscan your_server_ip` на вашем локальном компьютере и скопируйте результат.  Это позволит GitHub Actions верифицировать ваш сервер.
+
+3.  **Деплой:**
+    *   После push-а в ветку develop, github actions автоматический выполнит действия указанные в yml файле, и развернет проект на сервере.
+
+## Адрес сервера
+
+[http://your_server_ip](http://your_server_ip)
